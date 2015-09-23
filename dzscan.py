@@ -57,7 +57,7 @@ def update_plugin():
 		addones=re.findall(r'<img src="resource/plugin/(.*)" />',data)
 		for a in addones:
 			u=a.split('.png?')[0]
-			ux=a.split('alt="')[1]
+			ux=a.split('alt="')[1].decode('gbk').encode('utf-8')
 			adds="%s %s"%(u,ux)
 			alladds.append(adds)
 			print adds
