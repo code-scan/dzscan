@@ -98,9 +98,9 @@ class DzscanBase():
         robots_path = urljoin(self.url, '/robots.txt')
         req = requests.get(robots_path)
         if req.status_code == 200:
-            print '[!] The Discuz! \'%s\' file exists exposing a version number.' % robots_path
+            print '[!] The Discuz! \'%s\' file exists exposing a version number.\n' % robots_path
             ver = req.content.split('#')[2].split(' for ')[1]
-            print '[+] Discuz! version \'%s\' identified from fingerprinting.' % strip(ver)
+            print '[+] Discuz! version \'%s\' identified from fingerprinting.\n\n' % strip(ver)
 
     def fetch_addons(self):
         while self.ctn:
