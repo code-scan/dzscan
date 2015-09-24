@@ -13,7 +13,7 @@ codescan@yeah.net  若有朋友有兴趣一起长期做下去也可以联系我�
 如果adds.txt在linux下存在乱码的问题请执行 
 
 ```
-iconv -f gb2313 -t utf-8 adds.txt > adds.txt
+iconv -f gb2312  -t utf-8 adds.txt > adds.txt
 ```
 
 使用方法： 
