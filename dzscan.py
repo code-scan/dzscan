@@ -76,6 +76,7 @@ class DzscanBase():
         self.ctn = True
         self.verbose = argsDic['verbose']
         self.reqs = 0
+        self.outs = 0
 
     def update(self):
         print '[i] Updateing Database ...'
@@ -134,8 +135,8 @@ class DzscanBase():
         while self.ctn:
             try:
                 addon_name = self.queue.get_nowait()               
-                self.exist_examine(addon_name)
                 self.stdout(addon_name)
+                self.exist_examine(addon_name)
                 # self.count += 1
             except Empty:
                 self.ctn = False
@@ -165,8 +166,9 @@ class DzscanBase():
                 exist = rule(req.content)
 
             if exist:
-                sucMsg = '[!] Find addon \'{}\' : \'{}\' !'.format(addon_name, examine_url)
+                sucMsg = '\n[!] Find addon \'{}\' : \'{}\' !'.format(addon_name, examine_url)
                 print sucMsg
+                self.outs += 1
         except:
             pass
 
@@ -203,7 +205,7 @@ if __name__ == "__main__":
         print '[+] Enumerating plugins from passive detection ...'
         base.init_addon()
         base.execute()
-    print '[+] %s plugins found.                             \n' % 'No'
+    print '[+] %s plugins found.                   \n' % (base.outs or 'No')
     print '[+] Finished: %s.' % time.ctime()
     print '[+] Requests Done: %s.' % base.reqs
     sec = (datetime.datetime.now() - start_time).seconds
