@@ -186,6 +186,9 @@ if __name__ == "__main__":
 
     if cmdArgs['update']:
         base.update()
+    if cmdArgs['url']==None:
+        print "usage: ./dzscan.py --help"
+        exit()
     else:
         # fetch_vul('cnqn_rollad')
         base.fetch_version()
