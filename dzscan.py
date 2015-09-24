@@ -169,8 +169,8 @@ class DzscanBase():
                 sucMsg = '\n[!] Find addon \'{}\' : \'{}\' !'.format(addon_name, examine_url)
                 print sucMsg
                 self.outs += 1
-        except:
-            pass
+        except Exception as ex:
+            print ex
 
 
 def rule(content):
