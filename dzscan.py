@@ -5,7 +5,8 @@ from gevent import monkey; monkey.patch_all()
 from string import strip
 from urlparse import urljoin
 from Queue import Queue, Empty
-from time import sleep
+
+import datetime
 import json, gevent
 import re, sys, time
 import argparse, requests
@@ -65,24 +66,25 @@ _______________________________________________________________
 class DzscanBase():
 
     def __init__(self, argsDic):
-        self.plugin_pages = 169
+        self.plugin_pages = 3
         self.addonTol = set()
         self.url = argsDic['url'] or 'http://www.discuz.net'
         self.addon_path = '%s?id=' % urljoin(self.url, '/plugin.php')
         self.queue = Queue()
         self.gevents = argsDic['gevent'] or 10
         self.pool = []
-        self.count = 0
         self.ctn = True
         self.verbose = argsDic['verbose']
+        self.reqs = 0
 
     def update(self):
         print '[i] Updateing Database ...'
         fetch_url = 'http://addon.discuz.com/index.php?view=plugins&f_order=create&page=%s'
         pattern = re.compile(r'<img src="resource/plugin/(.*)"')
 
-        for page in xrange(1, 152):
+        for page in xrange(1, self.plugin_pages + 1):
             req = requests.get(fetch_url % page)
+            self.reqs += 1
             addons = pattern.findall(req.content)
 
             for addon in addons:
@@ -97,30 +99,36 @@ class DzscanBase():
     def fetch_version(self):
         robots_path = urljoin(self.url, '/robots.txt')
         req = requests.get(robots_path)
+        self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists .\n' % robots_path
             ver = req.content.split('#')[2].split(' for ')[1]
             print '[+] Discuz! version \'%s\' .\n\n' % strip(ver)
+
         robots_path = urljoin(self.url, '/source/plugin/tools/tools.php')
         req = requests.get(robots_path)
+        self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path       
 
         #/utility/convert/index.php?a=config&source=d7.2_x2.0 
         robots_path = urljoin(self.url, '/utility/convert/index.php?a=config&source=d7.2_x2.0')
         req = requests.get(robots_path)
+        self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path   
+
         #develop.php
         robots_path = urljoin(self.url, '/develop.php')
         req = requests.get(robots_path)
+        self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path  
-    def stdout(self,data):
-        scanow="[*]Scan %s "%data
+
+    def stdout(self, name):
+        scanow = '[*] scan addon \'%s\' for exisitance... ' % name
         sys.stdout.write(str(scanow)+" "*20+"\b\b\r")
         sys.stdout.flush()
-        sleep(0.5)
     
     def fetch_addons(self):
         while self.ctn:
@@ -150,6 +158,7 @@ class DzscanBase():
             print '[*] scan addon \'%s\' for exisitance... ' % addon_name
         try:    
             req = requests.get(examine_url)
+            self.reqs += 1
             if 'charset=gbk' in req.content:
                 exist = rule(req.content.decode('gbk').encode('utf8'))
             else:
@@ -169,7 +178,6 @@ def rule(content):
     return False
 
 
-
 def fetch_vul(addon):
     fetch_url = 'http://dzscan.org/index.php/welcome/view?plugin=%s' % addon
     json_data = json.loads(requests.get(fetch_url).content)
@@ -178,19 +186,25 @@ def fetch_vul(addon):
 
 
 if __name__ == "__main__":
+    start_time = datetime.datetime.now()
     banner()
     cmdArgs = parseCmd()
 
     base = DzscanBase(cmdArgs)
-    # {'url': None, 'force': False, 'update': True, 'verbose': False}
+    # {'url': None, 'force': False, 'gevents': 10, 'update': True, 'verbose': False}
 
     if cmdArgs['update']:
         base.update()
-    if cmdArgs['url']==None:
+    elif cmdArgs['url'] == None:
         print "usage: ./dzscan.py --help"
-        exit()
     else:
         # fetch_vul('cnqn_rollad')
         base.fetch_version()
+        print '[+] Enumerating plugins from passive detection ...'
         base.init_addon()
         base.execute()
+    print '[+] %s plugins found.                             \n' % 'No'
+    print '[+] Finished: %s.' % time.ctime()
+    print '[+] Requests Done: %s.' % base.reqs
+    sec = (datetime.datetime.now() - start_time).seconds
+    print '[+] Elapsed time: {}:{}:{}.'.format(sec / 3600, sec % 3600 / 60, sec % 60)
