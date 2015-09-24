@@ -161,9 +161,9 @@ class DzscanBase():
             req = requests.get(examine_url)
             self.reqs += 1
             if 'charset=gbk' in req.content:
-                exist = rule(req.content.decode('gbk').encode('utf8'))
+                exist = examine(req.content.decode('gbk').encode('utf8'))
             else:
-                exist = rule(req.content)
+                exist = examine(req.content)
 
             if exist:
                 sucMsg = '\n[!] Find addon \'{}\' : \'{}\' !'.format(addon_name, examine_url)
@@ -173,7 +173,7 @@ class DzscanBase():
             print ex
 
 
-def rule(content):
+def examine(content):
     if '插件不存在或已关闭' not in content and len(content) > 1000 \
             and 'http://error.www.xiaomi.cn' not in content:
         return True
@@ -197,14 +197,16 @@ if __name__ == "__main__":
 
     if cmdArgs['update']:
         base.update()
+
     elif cmdArgs['url'] == None:
         print "usage: ./dzscan.py --help"
+
     else:
-        # fetch_vul('cnqn_rollad')
         base.fetch_version()
         print '[+] Enumerating plugins from passive detection ...'
         base.init_addon()
         base.execute()
+
     print '[+] %s plugins found.                   \n' % (base.outs or 'No')
     print '[+] Finished: %s.' % time.ctime()
     print '[+] Requests Done: %s.' % base.reqs
