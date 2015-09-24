@@ -30,4 +30,5 @@ iconv -f gb2312  -t utf-8 adds.txt > adds.txt
 使用方法： 
 ```
 dzscan.py -u  http://dzscan.org/ --gevent 20
+dzscan.py --update
 ```
