@@ -33,11 +33,14 @@ def parseCmd():
     parser.add_argument('-h', '--help', action='help', 
                         help='Show help message and exit.')
 
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        default=False, help='Show verbose message during scaning')
+
     parser.add_argument('--update', dest='update', action='store_true', default=False,
                         help='Update database to the latests version.')
 
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        default=False, help='Show verbose message during scaning')
+    parser.add_argument('--log', dest='log', action='store_true', default=False,
+                        help='Record scan output in .log file')
 
     args = parser.parse_args()
     return args.__dict__
@@ -77,6 +80,7 @@ class DzscanBase():
         self.verbose = argsDic['verbose']
         self.reqs = 0
         self.outs = 0
+        self.log = argsDic['log']
 
     def update(self):
         print '[i] Updateing Database ...'
@@ -193,7 +197,7 @@ if __name__ == "__main__":
     cmdArgs = parseCmd()
 
     base = DzscanBase(cmdArgs)
-    # {'url': None, 'force': False, 'gevents': 10, 'update': True, 'verbose': False}
+    # {'url': None, 'force': False, 'gevents': 10, 'update': True, 'verbose': False, 'log': False}
 
     if cmdArgs['update']:
         base.update()
@@ -207,8 +211,17 @@ if __name__ == "__main__":
         base.init_addon()
         base.execute()
 
-    print '[+] %s plugins found.                   \n' % (base.outs or 'No')
-    print '[+] Finished: %s.' % time.ctime()
-    print '[+] Requests Done: %s.' % base.reqs
+    if not base.log:
+        pointer = sys.stdout
+    else:
+        from urlparse import urlsplit
+        log_name = urlsplit(base.url)[1].replace('.', '_')
+        pointer = open('%s.log' % log_name, 'a')
+
+    pointer.write('[+] %s plugins found.                            \n' % (base.outs or 'No'))
+    pointer.write('[+] Finished: %s.\n' % time.ctime())
+    pointer.write('[+] Requests Done: %s.\n' % base.reqs)
     sec = (datetime.datetime.now() - start_time).seconds
-    print '[+] Elapsed time: {}:{}:{}.'.format(sec / 3600, sec % 3600 / 60, sec % 60)
+    pointer.write('[+] Elapsed time: {}:{}:{}.\n'.format(sec / 3600, sec % 3600 / 60, sec % 60))
+
+    pointer.close()
