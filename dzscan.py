@@ -5,7 +5,7 @@ from gevent import monkey; monkey.patch_all()
 from string import strip
 from urlparse import urljoin
 from Queue import Queue, Empty
-
+from time import sleep
 import json, gevent
 import re, sys, time
 import argparse, requests
@@ -56,7 +56,7 @@ def banner():
     ╚═════╝ ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝
     Dizscan! Security Scanner by the DzScan Team
     Version 0.2
-    http://dzscan.org @Cond0r
+    http://dzscan.org wyc@Dzscan
 _______________________________________________________________
     """
     print str
@@ -81,7 +81,7 @@ class DzscanBase():
         fetch_url = 'http://addon.discuz.com/index.php?view=plugins&f_order=create&page=%s'
         pattern = re.compile(r'<img src="resource/plugin/(.*)"')
 
-        for page in xrange(1, 2):
+        for page in xrange(1, 152):
             req = requests.get(fetch_url % page)
             addons = pattern.findall(req.content)
 
@@ -98,15 +98,36 @@ class DzscanBase():
         robots_path = urljoin(self.url, '/robots.txt')
         req = requests.get(robots_path)
         if req.status_code == 200:
-            print '[!] The Discuz! \'%s\' file exists exposing a version number.\n' % robots_path
+            print '[!] The Discuz! \'%s\' file exists .\n' % robots_path
             ver = req.content.split('#')[2].split(' for ')[1]
-            print '[+] Discuz! version \'%s\' identified from fingerprinting.\n\n' % strip(ver)
+            print '[+] Discuz! version \'%s\' .\n\n' % strip(ver)
+        robots_path = urljoin(self.url, '/source/plugin/tools/tools.php')
+        req = requests.get(robots_path)
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path       
 
+        #/utility/convert/index.php?a=config&source=d7.2_x2.0 
+        robots_path = urljoin(self.url, '/utility/convert/index.php?a=config&source=d7.2_x2.0')
+        req = requests.get(robots_path)
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path   
+        #develop.php
+        robots_path = urljoin(self.url, '/develop.php')
+        req = requests.get(robots_path)
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path  
+    def stdout(self,data):
+        scanow="[*]Scan %s "%data
+        sys.stdout.write(str(scanow)+" "*20+"\b\b\r")
+        sys.stdout.flush()
+        sleep(0.5)
+    
     def fetch_addons(self):
         while self.ctn:
             try:
-                addon_name = self.queue.get_nowait()
+                addon_name = self.queue.get_nowait()               
                 self.exist_examine(addon_name)
+                self.stdout(addon_name)
                 # self.count += 1
             except Empty:
                 self.ctn = False
@@ -127,15 +148,18 @@ class DzscanBase():
         examine_url = '{}{}'.format(self.addon_path, addon_name)
         if self.verbose:
             print '[*] scan addon \'%s\' for exisitance... ' % addon_name
-        req = requests.get(examine_url)
-        if 'charset=gbk' in req.content:
-            exist = rule(req.content.decode('gbk').encode('utf8'))
-        else:
-            exist = rule(req.content)
+        try:    
+            req = requests.get(examine_url)
+            if 'charset=gbk' in req.content:
+                exist = rule(req.content.decode('gbk').encode('utf8'))
+            else:
+                exist = rule(req.content)
 
-        if exist:
-            sucMsg = '\n[!] Find addon \'{}\' : \'{}\' !\n'.format(addon_name, examine_url)
-            print sucMsg
+            if exist:
+                sucMsg = '[!] Find addon \'{}\' : \'{}\' !'.format(addon_name, examine_url)
+                print sucMsg
+        except:
+            pass
 
 
 def rule(content):
