@@ -164,7 +164,6 @@ if __name__ == "__main__":
         base.update()
     else:
         # fetch_vul('cnqn_rollad')
-        # base.fetch_version()
+        base.fetch_version()
         base.init_addon()
-        # base.fetch_addons()
         base.execute()
