@@ -107,8 +107,11 @@ class DzscanBase():
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists .\n' % robots_path
-            ver = req.content.split('#')[2].split(' for ')[1]
-            print '[+] Discuz! version \'%s\' .\n\n' % strip(ver)
+            try:
+                ver = req.content.split('#')[2].split(' for ')[1]
+                print '[+] Discuz! version \'%s\' .\n\n' % strip(ver)
+            except IndexError:
+                print '[!] But seems no version revealed'
 
         robots_path = urljoin(self.url, '/source/plugin/tools/tools.php')
         req = requests.get(robots_path)
