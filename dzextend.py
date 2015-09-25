@@ -19,7 +19,7 @@ class dzextend:
         username=r'<meta name="description" content="(.*?)" />'
         group=r'amp;gid=(.*)" target="_blank">'
         for id in range(start,stop):
-            print id
+            #print id
             url=target+"/home.php?mod=space&uid=%d"%id
             respone=self.Request_Get(url)
             try:
