@@ -64,7 +64,7 @@ class DzscanBase():
             print '[!] The Discuz! \'%s\' file exists .\n' % robots_path
             try:
                 ver = req.content.split('#')[2].split(' for ')[1]
-                print '[+] Discuz! version \'%s\' .\n\n' % strip(ver)
+                print '[+] Discuz! version \'%s\' .\n' % strip(ver)
             except IndexError:
                 print '[!] But seems no version revealed'
 
@@ -168,7 +168,10 @@ class DzscanBase():
         """
         @func 尝试遍历所有在首页上被调用的插件
         """
+        print '[-] Enumerating plugins from index.php ...'
+
         req = requests.get(self.url)
+        base.reqs += 1
 
         if 'charset=gbk' in req.content:
             content = req.content.decode('gbk').encode('utf8')
@@ -177,6 +180,8 @@ class DzscanBase():
 
         for plg in self.plgptn.findall(content):
             self.outs.add(plg[1])
+
+        print '[+] In "index.php" %s plugins are found.\n' % len(self.outs)
 
 
 if __name__ == "__main__":
@@ -188,7 +193,6 @@ if __name__ == "__main__":
     # {'url': None, 'force': False, 'gevents': 10, 'update': True, 'verbose': False, 'log': False}
     # base.brute_founder_pwd('admin')
     # base.brute_admin_id()
-    base.fetch_index_plugin()
 
     if cmdArgs['update']:
         base.update()
@@ -198,24 +202,26 @@ if __name__ == "__main__":
 
     else:
         base.fetch_version()
-        print '[+] Enumerating plugins from passive detection ...'
+        base.fetch_index_plugin()
+
+        print '[-] Enumerating plugins from passive detection ...'
         base.init_addon()
         base.execute()
 
-    if not base.log:
-        pointer = sys.stdout
-    else:
-        from urlparse import urlsplit
-        log_name = urlsplit(base.url)[1].replace('.', '_')
-        pointer = open('%s.log' % log_name, 'a')
+        if not base.log:
+            pointer = sys.stdout
+        else:
+            from urlparse import urlsplit
+            log_name = urlsplit(base.url)[1].replace('.', '_')
+            pointer = open('%s.log' % log_name, 'a')
 
-    for out in base.outs:
-        pointer.write('\n\n[+] Plugin "%s" \n******** \n\n********\n\n' % out)
+        for out in base.outs:
+            pointer.write('\n\n[+] Plugin "%s" \n******** \n\n用来写漏洞内容的\n\n********\n\n' % out)
 
-    pointer.write('[+] %s plugins found.                            \n' % (len(base.outs) or 'No'))
-    pointer.write('[+] Finished: %s.\n' % time.ctime())
-    pointer.write('[+] Requests Done: %s.\n' % base.reqs)
-    sec = (datetime.datetime.now() - start_time).seconds
-    pointer.write('[+] Elapsed time: {:0>2d}:{:0>2d}:{:0>2d}.\n'.format(sec / 3600, sec % 3600 / 60, sec % 60))
+        pointer.write('[+] %s plugins found.                            \n' % (len(base.outs) or 'No'))
+        pointer.write('[+] Finished: %s.\n' % time.ctime())
+        pointer.write('[+] Requests Done: %s.\n' % base.reqs)
+        sec = (datetime.datetime.now() - start_time).seconds
+        pointer.write('[+] Elapsed time: {:0>2d}:{:0>2d}:{:0>2d}.\n'.format(sec / 3600, sec % 3600 / 60, sec % 60))
 
-    pointer.close()
+        pointer.close()
