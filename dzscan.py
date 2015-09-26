@@ -74,7 +74,7 @@ class DzscanBase():
         self.url = argsDic['url'] or 'http://www.discuz.net'
         self.addon_path = '%s?id=' % urljoin(self.url, '/plugin.php')
         self.queue = Queue()
-        self.gevents = int(argsDic['gevent']) or 10
+        self.gevents = int(argsDic['gevent']) if argsDic['gevent'] else 10
         self.pool = []
         self.ctn = True
         self.verbose = argsDic['verbose']
