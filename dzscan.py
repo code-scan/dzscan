@@ -3,7 +3,6 @@
 
 from gevent import monkey; monkey.patch_all()
 from string import strip
-from urlparse import urljoin
 from Queue import Queue, Empty
 
 import datetime
@@ -72,7 +71,7 @@ class DzscanBase():
         self.plugin_pages = 3
         self.addonTol = set()
         self.url = argsDic['url'] or 'http://www.discuz.net'
-        self.addon_path = '%s?id=' % urljoin(self.url, '/plugin.php')
+        self.addon_path = '%s/%s?id=' % (self.url, '/plugin.php')
         self.queue = Queue()
         self.gevents = int(argsDic['gevent']) if argsDic['gevent'] else 10
         self.pool = []
@@ -102,7 +101,7 @@ class DzscanBase():
                 fp.write('%s, %s\n' % add)
 
     def fetch_version(self):
-        robots_path = urljoin(self.url, '/robots.txt')
+        robots_path = '%s/%s' % (self.url, '/robots.txt')
         req = requests.get(robots_path)
         self.reqs += 1
         if req.status_code == 200:
@@ -113,21 +112,21 @@ class DzscanBase():
             except IndexError:
                 print '[!] But seems no version revealed'
 
-        robots_path = urljoin(self.url, '/source/plugin/tools/tools.php')
+        robots_path = '%s/%s' % (self.url, '/source/plugin/tools/tools.php')
         req = requests.get(robots_path)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path       
 
         #/utility/convert/index.php?a=config&source=d7.2_x2.0 
-        robots_path = urljoin(self.url, '/utility/convert/index.php?a=config&source=d7.2_x2.0')
+        robots_path = '%s/%s' % (self.url, '/utility/convert/index.php?a=config&source=d7.2_x2.0')
         req = requests.get(robots_path)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path   
 
         #develop.php
-        robots_path = urljoin(self.url, '/develop.php')
+        robots_path = '%s/%s' % (self.url, '/develop.php')
         req = requests.get(robots_path)
         self.reqs += 1
         if req.status_code == 200:
@@ -144,7 +143,6 @@ class DzscanBase():
                 addon_name = self.queue.get_nowait()               
                 self.stdout(addon_name)
                 self.exist_examine(addon_name)
-                # self.count += 1
             except Empty:
                 self.ctn = False
 
