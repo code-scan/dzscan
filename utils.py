@@ -3,9 +3,18 @@
 
 import requests
 import argparse, json
+from random import randint
 
 
 USAGE = './dzscan.py [options]'
+
+
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0",
+            "X-Forwarded-For": '%s:%s:%s:%s' % (randint(1, 255),
+                randint(1, 255), randint(1, 255), randint(1, 255)),
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Connection': 'keep-alive'}
 
 
 def parseCmd():
