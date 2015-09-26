@@ -17,18 +17,25 @@ import gevent, requests
 class DzscanBase():
 
     def __init__(self, argsDic):
+        self.reqs = 0
         self.plugin_pages = 3
+
+        self.outs = set()
+        self.admins = set()
         self.addonTol = set()
-        self.url = argsDic['url'] or 'http://www.discuz.net'
-        self.addon_path = '%s/%s?id=' % (self.url, '/plugin.php')
+
         self.queue = Queue()
-        self.gevents = int(argsDic['gevent']) if argsDic['gevent'] else 10
         self.pool = []
         self.ctn = True
         self.verbose = argsDic['verbose']
-        self.reqs = 0
-        self.outs = 0
         self.log = argsDic['log']
+        self.url = argsDic['url'] or 'http://www.discuz.net'
+        self.addon_path = '%s/%s?id=' % (self.url, '/plugin.php')
+        self.gevents = int(argsDic['gevent']) if argsDic['gevent'] else 10
+
+        self.usrptn = re.compile('<meta name="description" content="(.*?)的个人资料')
+        self.gidptn = re.compile('amp;gid=(.*?)" target="_blank">')
+        self.plgptn = re.compile('(src="|href=")?plugin.php\?id=(.+?)(:.+?)?("|&)')
 
     def update(self):
         print '[i] Updateing Database ...'
@@ -82,7 +89,7 @@ class DzscanBase():
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path  
 
     def stdout(self, name):
-        scanow = '[*] scan addon \'%s\' for exisitance... ' % name
+        scanow = '[*] Scan addon \'%s\' for exisitance... ' % name
         sys.stdout.write(str(scanow)+" "*20+"\b\b\r")
         sys.stdout.flush()
     
@@ -120,13 +127,11 @@ class DzscanBase():
                 exist = examine(req.content)
 
             if exist:
-                sucMsg = '\n[!] Find addon \'{}\' : \'{}\' !'.format(addon_name, examine_url)
-                print sucMsg
-                self.outs += 1
+                self.outs.add(addon_name)
         except Exception as ex:
             print ex
 
-    def brute_founder(self, pwd, path='/uc_server'):
+    def brute_founder_pwd(self, pwd, path='/uc_server'):
         """ 
         @func 尝试以pwd作为创始人密码登陆 
         """
@@ -142,6 +147,37 @@ class DzscanBase():
 
         return False
 
+    def brute_admin_id(self, start=1, stop=2):
+        """
+        @func 尝试遍历所有管理员id
+        """
+        for id in xrange(start, stop):
+            usr_url = '%s/home.php?mod=space&uid=%s' % (self.url, id)
+            req = requests.get(usr_url)
+            if 'charset=gbk' in req.content:
+                content = req.content.decode('gbk').encode('utf8')
+            else:
+                content = req.content
+
+            if self.gidptn.search(req.content).group(1) == '1':
+                self.admins.add(self.usrptn.search(req.content).group(1))
+
+        return self.admins
+
+    def fetch_index_plugin(self):
+        """
+        @func 尝试遍历所有在首页上被调用的插件
+        """
+        req = requests.get(self.url)
+
+        if 'charset=gbk' in req.content:
+            content = req.content.decode('gbk').encode('utf8')
+        else:
+            content = req.content
+
+        for plg in self.plgptn.findall(content):
+            self.outs.add(plg[1])
+
 
 if __name__ == "__main__":
     start_time = datetime.datetime.now()
@@ -150,7 +186,9 @@ if __name__ == "__main__":
 
     base = DzscanBase(cmdArgs)
     # {'url': None, 'force': False, 'gevents': 10, 'update': True, 'verbose': False, 'log': False}
-    base.login_founder('admin')
+    # base.brute_founder_pwd('admin')
+    # base.brute_admin_id()
+    base.fetch_index_plugin()
 
     if cmdArgs['update']:
         base.update()
@@ -171,10 +209,13 @@ if __name__ == "__main__":
         log_name = urlsplit(base.url)[1].replace('.', '_')
         pointer = open('%s.log' % log_name, 'a')
 
-    pointer.write('[+] %s plugins found.                            \n' % (base.outs or 'No'))
+    for out in base.outs:
+        pointer.write('\n\n[+] Plugin "%s" \n******** \n\n********\n\n' % out)
+
+    pointer.write('[+] %s plugins found.                            \n' % (len(base.outs) or 'No'))
     pointer.write('[+] Finished: %s.\n' % time.ctime())
     pointer.write('[+] Requests Done: %s.\n' % base.reqs)
     sec = (datetime.datetime.now() - start_time).seconds
-    pointer.write('[+] Elapsed time: {}:{}:{}.\n'.format(sec / 3600, sec % 3600 / 60, sec % 60))
+    pointer.write('[+] Elapsed time: {:0>2d}:{:0>2d}:{:0>2d}.\n'.format(sec / 3600, sec % 3600 / 60, sec % 60))
 
     pointer.close()
