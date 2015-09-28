@@ -43,7 +43,7 @@ class DzscanBase():
         pattern = re.compile(r'<img src="resource/plugin/(.*)"')
 
         for page in xrange(1, self.plugin_pages + 1):
-            req = requests.get(fetch_url % page)
+            req = requests.get(fetch_url % page, headers=HEADERS)
             self.reqs += 1
             addons = pattern.findall(req.content)
 
@@ -58,7 +58,7 @@ class DzscanBase():
 
     def fetch_version(self):
         robots_path = '%s/%s' % (self.url, '/robots.txt')
-        req = requests.get(robots_path)
+        req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists .\n' % robots_path
@@ -69,21 +69,21 @@ class DzscanBase():
                 print '[!] But seems no version revealed'
 
         robots_path = '%s/%s' % (self.url, '/source/plugin/tools/tools.php')
-        req = requests.get(robots_path)
+        req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path       
 
         #/utility/convert/index.php?a=config&source=d7.2_x2.0 
         robots_path = '%s/%s' % (self.url, '/utility/convert/index.php?a=config&source=d7.2_x2.0')
-        req = requests.get(robots_path)
+        req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path   
 
         #develop.php
         robots_path = '%s/%s' % (self.url, '/develop.php')
-        req = requests.get(robots_path)
+        req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path  
@@ -119,7 +119,7 @@ class DzscanBase():
         if self.verbose:
             print '[*] scan addon \'%s\' for exisitance... ' % addon_name
         try:    
-            req = requests.get(examine_url)
+            req = requests.get(examine_url, headers=HEADERS)
             self.reqs += 1
             if 'charset=gbk' in req.content:
                 exist = examine(req.content.decode('gbk').encode('utf8'))
@@ -153,7 +153,7 @@ class DzscanBase():
         """
         for id in xrange(start, stop):
             usr_url = '%s/home.php?mod=space&uid=%s' % (self.url, id)
-            req = requests.get(usr_url)
+            req = requests.get(usr_url, headers=HEADERS)
             if 'charset=gbk' in req.content:
                 content = req.content.decode('gbk').encode('utf8')
             else:
@@ -170,7 +170,7 @@ class DzscanBase():
         """
         print '[-] Enumerating plugins from index.php ...'
 
-        req = requests.get(self.url)
+        req = requests.get(self.url, headers=HEADERS)
         base.reqs += 1
 
         if 'charset=gbk' in req.content:

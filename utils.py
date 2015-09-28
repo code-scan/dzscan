@@ -9,12 +9,12 @@ from random import randint
 USAGE = './dzscan.py [options]'
 
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0",
-            "X-Forwarded-For": '%s:%s:%s:%s' % (randint(1, 255),
-                randint(1, 255), randint(1, 255), randint(1, 255)),
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Connection': 'keep-alive'}
+HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36",
+           "X-Forwarded-For": '%s:%s:%s:%s' % (randint(1, 255),
+               randint(1, 255), randint(1, 255), randint(1, 255)),
+           "Content-Type": "application/x-www-form-urlencoded",
+           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+           "Connection": "keep-alive"}
 
 
 def parseCmd():
