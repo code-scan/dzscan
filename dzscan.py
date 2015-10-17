@@ -148,6 +148,15 @@ class DzscanBase():
 
         return False
 
+    def brute_with_file(self, pwd_file='pwd.txt'):
+        """
+        @func 尝试以pwd.txt文件夹中的所有password对创始人进行爆破
+        """
+        with open('pwd.txt', 'r') as fp:
+            for pwd in fp.readlines():
+                if self.brute_founder_pwd(strip(pwd)):
+                    break
+
     def brute_admin_id(self, start=1, stop=2):
         """
         @func 尝试遍历所有管理员id
