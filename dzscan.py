@@ -8,6 +8,7 @@ from Queue import Queue, Empty
 from utils import HEADERS
 from utils import examine, banner
 from utils import USAGE, parseCmd
+from utils import fetch_vul
 
 import datetime
 import re, sys, time
@@ -205,8 +206,8 @@ if __name__ == "__main__":
         base.fetch_index_plugin()
 
         print '[-] Enumerating plugins from passive detection ...'
-        base.init_addon()
-        base.execute()
+        # base.init_addon()
+        # base.execute()
 
         if not base.log:
             pointer = sys.stdout
@@ -215,8 +216,16 @@ if __name__ == "__main__":
             log_name = urlsplit(base.url)[1].replace('.', '_')
             pointer = open('%s.log' % log_name, 'a')
 
+        pointer.write('\n')
         for out in base.outs:
-            pointer.write('\n\n[+] Plugin "%s" \n******** \n\n用来写漏洞内容的\n\n********\n\n' % out)
+            ids = fetch_vul(out)
+            pointer.write('[-] Plugin %s found !\n' % out)
+            if not ids:
+                pointer.write('[!] But no vul(s) relative to this plugin : (\n\n')
+            else:
+                for id in ids:
+                    pointer.write('[+] Found vul No.%s relative : )' % id)
+                    pointer.write('Enter http://dzscan.org/index.php/welcome/view?id=%s to view detail' % id)
 
         pointer.write('[+] %s plugins found.                            \n' % (len(base.outs) or 'No'))
         pointer.write('[+] Finished: %s.\n' % time.ctime())

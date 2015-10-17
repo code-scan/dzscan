@@ -77,7 +77,9 @@ def examine(content):
 
 
 def fetch_vul(addon):
-    fetch_url = 'http://dzscan.org/index.php/welcome/view?plugin=%s' % addon
-    json_data = json.loads(requests.get(fetch_url).content)
+    ids = set()
+    url = 'http://dzscan.org/index.php/welcome/view?plugin=%s' % addon
+    json_data = json.loads(requests.get(url).content)
     for vul in json_data:
-        return "http://dzscan.org/index.php/welcome/view?id=%s" % vul['id']
+        ids.add(vul['id'])
+    return ids
