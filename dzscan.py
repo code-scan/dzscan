@@ -69,20 +69,69 @@ class DzscanBase():
             except IndexError:
                 print '[!] But seems no version revealed'
 
+    def fetch_sensitive(self):
+        # X3 Deafult password 188281MWWxjk
+        # https://www.bugscan.net/#!/n/449
         robots_path = '%s/%s' % (self.url, '/source/plugin/tools/tools.php')
         req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path       
-
-        #/utility/convert/index.php?a=config&source=d7.2_x2.0 
+        # X3.1 Remote code execute
+        # https://www.sebug.net/vuldb/ssvid-61217
         robots_path = '%s/%s' % (self.url, '/utility/convert/index.php?a=config&source=d7.2_x2.0')
         req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path   
+        
+        # 7.2 faq.php SQL
+        # https://www.bugscan.net/#!/n/118
+        robots_path = '%s/%s' % (self.url, '/faq.php')
+        req = requests.get(robots_path, headers=HEADERS)
+        self.reqs += 1
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path
 
-        #develop.php
+        # 7.2 manyou SQL
+        # http://www.venustech.com.cn/NewsInfo/124/6791.Html
+        robots_path = '%s/%s' % (self.url, '/manyou/userapp.php')
+        req = requests.get(robots_path, headers=HEADERS)
+        self.reqs += 1
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path
+
+        # 7.2 admincp.php XSS 
+        # https://www.bugscan.net/#!/n/141
+        robots_path = '%s/%s' % (self.url, '/manyou/admincp.php?my_suffix=%0A%0DTOBY57')
+        req = requests.get(robots_path, headers=HEADERS)
+        self.reqs += 1
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path
+
+        # 6.x SQL 
+        # http://www.wooyun.org/bugs/wooyun-2014-080359
+        robots_path = '%s/%s' % (self.url, '/my.php')
+        req = requests.get(robots_path, headers=HEADERS)
+        self.reqs += 1
+        if req.status_code == 200:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path
+
+        # deafult admin login page
+        robots_path = '%s/%s' % (self.url, '/admin.php')
+        req = requests.get(robots_path, headers=HEADERS, allow_redirects=False)
+        self.reqs += 1
+        if req.status_code == 200 and 'Comsenz' in req.content:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path
+
+        # deafult uc_server login page
+        robots_path = '%s/%s' % (self.url, '/uc_server/admin.php')
+        req = requests.get(robots_path, headers=HEADERS, allow_redirects=False)
+        self.reqs += 1
+        if req.status_code == 200 and 'UCenter' in req.content:
+            print '[!] The Discuz! \'%s\' file exists.\n' % robots_path
+
+        # develop.php
         robots_path = '%s/%s' % (self.url, '/develop.php')
         req = requests.get(robots_path, headers=HEADERS)
         self.reqs += 1
@@ -212,6 +261,7 @@ if __name__ == "__main__":
 
     else:
         base.fetch_version()
+        base.fetch_sensitive()
         base.fetch_index_plugin()
 
         print '[-] Enumerating plugins from passive detection ...'
