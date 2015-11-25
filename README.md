@@ -5,12 +5,12 @@
 ##扫描的漏洞路径如下:
 - deafult admin & uc_server login page
 - develop.php
-- #####X3
+- X3
  - [X3 Deafult password 188281MWWxjk](https://www.bugscan.net/#!/n/449)
  - [X3.1 Remote code execute](https://www.sebug.net/vuldb/ssvid-61217)
-- #####6.x
+- 6.x
  - [6.x SQL ](http://www.wooyun.org/bugs/wooyun-2014-080359)
-- #####7.x
+- 7.x
  - [7.2 faq.php SQL](https://www.bugscan.net/#!/n/118)
  - [7.2 manyou SQL](http://www.venustech.com.cn/NewsInfo/124/6791.Html)
  - [7.2 admincp.php XSS](https://www.bugscan.net/#!/n/141)
