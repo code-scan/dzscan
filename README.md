@@ -6,14 +6,14 @@
 - deafult admin & uc_server login page
 - develop.php
 - X3
- - [X3 Deafult password 188281MWWxjk](https://www.bugscan.net/#!/n/449)
- - [X3.1 Remote code execute](https://www.sebug.net/vuldb/ssvid-61217)
+ - [X3 tools/tools.php  ~ Deafult password 188281MWWxjk](https://www.bugscan.net/#!/n/449)
+ - [X3.1 utility/convert/index.php ~ Remote code execute](https://www.sebug.net/vuldb/ssvid-61217)
 - 6.x
- - [6.x SQL ](http://www.wooyun.org/bugs/wooyun-2014-080359)
+ - [6.x my.php ~ SQL ](http://www.wooyun.org/bugs/wooyun-2014-080359)
 - 7.x
- - [7.2 faq.php SQL](https://www.bugscan.net/#!/n/118)
- - [7.2 manyou SQL](http://www.venustech.com.cn/NewsInfo/124/6791.Html)
- - [7.2 admincp.php XSS](https://www.bugscan.net/#!/n/141)
+ - [7.2 faq.php ~ SQL](https://www.bugscan.net/#!/n/118)
+ - [7.2 manyou/userapp.php ~ SQL](http://www.venustech.com.cn/NewsInfo/124/6791.Html)
+ - [7.2 admincp.php ~ XSS](https://www.bugscan.net/#!/n/141)
 
 #安装与使用方法
 漏洞库首页 [Dzscan](http://dzscan.org/)
