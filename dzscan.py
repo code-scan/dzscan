@@ -138,6 +138,29 @@ class DzscanBase():
         if req.status_code == 200:
             print '[!] The Discuz! \'%s\' file exists.\n' % robots_path  
 
+        # backup files
+        backups = ['/config/config_ucenter.php.bak', 
+                 '/config/config_ucenter.php_', 
+                 '/config/config_ucenter.php=', 
+                 '/config/config_global.php.bak', 
+                 '/config/config_global.php_', 
+                 '/config/config_global.php=', 
+                 '/uc_server/data/config.inc.php.bak', 
+                 '/uc_server/data/config.inc.php_', 
+                 '/uc_server/data/config.inc.php=', 
+                 '/config.inc.php.bak', 
+                 '/config.inc.php_', 
+                 '/config.inc.php=', 
+                 '/config.php.bak', 
+                 '/config.php_'
+                 '/config.php='
+        ]
+        for backup in backups:
+            req = requests.get('%s%s' % (self.url, backup), headers=HEADERS)
+            self.reqs += 1
+            if req.status_code == 200:
+                print '[!] The Discuz! \'%s\' file exists.\n' % robots_path  
+
     def stdout(self, name):
         scanow = '[*] Scan addon \'%s\' for exisitance... ' % name
         sys.stdout.write(str(scanow)+" "*20+"\b\b\r")
