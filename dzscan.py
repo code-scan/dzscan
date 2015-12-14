@@ -212,7 +212,7 @@ class DzscanBase():
         req = requests.post(target_url, data={'ucfounderpw': pwd}, headers=HEADERS)
         self.reqs += 1
 
-        if req.content != '-1':
+        if req.content != '-1' and req.status_code == 200:
 
             sucMsg = "\n[!] Brute force attack find ucfound password : [%s] !\n" % pwd
             print sucMsg
